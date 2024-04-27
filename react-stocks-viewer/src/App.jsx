@@ -1,19 +1,18 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+// Import
+import { useState } from "react";
+import Header from "./components/Header"; // Header component
+import WeatherOutput from "./components/WeatherOutput"; // WeatherOutput component
 
 function App() {
-  const [count, setCount] = useState(0)
-
+  // JSX Output
   return (
     <>
-      <h1 className="text-3xl font-bold underline ">
-      Hello world!
-    </h1>
-
+      {/*Header*/}
+      <Header />
+      {/*Search field & Weather Output*/}
+      <WeatherOutput />
     </>
-  )
+  );
 }
 
-export default App
+export default App;
