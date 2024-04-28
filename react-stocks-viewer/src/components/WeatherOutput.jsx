@@ -1,40 +1,9 @@
 // Import
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { fetchWeatherData, fetchForecastData } from "../http";
 
-// Test function
-const address = fetch("https://jsonplaceholder.typicode.com/users/1")
-  .then((response) => response.json())
-  .then((user) => {
-    return user.address;
-  });
-
-// Function: Fetch weather data from API
-async function fetchWeatherData(cityName) {
-  // Fetch weather from API
-  const response = await fetch(
-    `https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=9c6d668b0cd18fe2e1509f29b3bedd9e&units=metric`
-  );
-  // Once the data is recieved - parse it
-  const resData = await response.json();
-  // Possible error response
-  if (!response.ok) {
-    return "Failed to fetch data";
-  }
-  // Define the weatherData object that will store all the weather data
-  let weatherData = {
-    city: resData.name,
-    temp: resData.main.temp,
-    feelsLike: resData.main.feels_like,
-    humidity: resData.main.humidity,
-    wind: resData.wind.speed,
-    code: resData.weather[0].id,
-    description: resData.weather[0].main,
-    icon: resData.weather[0].icon,
-    timezone: resData.timezone,
-  };
-  // Return
-  return weatherData;
-}
+// Test
+fetchForecastData("waRsaw");
 
 // WeatherOutput component
 export default function WeatherOutput() {
@@ -43,31 +12,36 @@ export default function WeatherOutput() {
   // useState - manage the data you are fetching (weather data)
   const [weatherData, setWeatherData] = useState();
   // useState - watch potentional errors
-  const [error, setError] = useState();
+  const [fetchError, setFetchError] = useState();
+  // useState - watch the text of the search field
+  const [searchField, setSearchField] = useState("");
 
-  // useEffect function - it is executed only if dependencies are changed. This will be executed only once
-  useEffect(() => {
-    // Create a new helper async function to use await
-    async function fetchData() {
-      // use setIsFetching so that useState watches if the data is loaded
-      setIsFetching(true);
-      // Try catch - necessary for possible errors
-      try {
-        // Call the fetchWeatherData function
-        const weatherData = await fetchWeatherData("poznan");
-        // use setWeatherData so that useState watches it
-        setWeatherData(weatherData);
-      } catch (error) {
-        // if error was encountered
-        // useState function
-        setError({ message: error.message || "Could not fetch data" });
-      }
-      // use setIsFetching - show that data is not loading
-      setIsFetching(false);
+  // handleChange function - watch change of the search term
+  function handleChange(event) {
+    // useState - watch change of the search term
+    setSearchField(event.target.value);
+  }
+
+  // handleSubmit function - once the form is submited, it sends the API request
+  async function handleSubmit(event) {
+    // Prevent reload
+    event.preventDefault();
+    // use setIsFetching so that useState watches if the data is loaded
+    setIsFetching(true);
+    // Try catch - necessary for possible errors
+    try {
+      // Call the fetchWeatherData function
+      const weatherData = await fetchWeatherData(searchField);
+      // use setWeatherData so that useState watches it
+      setWeatherData(weatherData);
+    } catch (error) {
+      // if error was encountered
+      // useState function
+      setFetchError(error.message || "Failed to fetch user places");
     }
-    // Execute the fetchData function
-    fetchData();
-  }, []);
+    // use setIsFetching - show that data is not loading
+    setIsFetching(false);
+  }
 
   // Results output
   let resultsOutput = (
@@ -77,19 +51,34 @@ export default function WeatherOutput() {
   if (weatherData) {
     resultsOutput = <p className="text-center pt-2">{weatherData.city}</p>;
   }
+  // If there was an error in fetch data
+  if (weatherData === "error") {
+    resultsOutput = (
+      <p className="text-center pt-2">Please enter a valid city name</p>
+    );
+  }
 
   // JSX Output
   return (
     <div className="pt-3 px-2">
       {/* Search field */}
-      <div className="flex flex-nowrap justify-between  border border-black rounded max-w-96 mx-auto">
+      <form
+        onSubmit={handleSubmit}
+        className="flex flex-nowrap justify-between  border border-black rounded max-w-96 mx-auto"
+      >
+        {/*Search Input*/}
         <input
           type="text"
-          placeholder="Type the city..."
+          placeholder="Type the city name..."
+          value={searchField}
+          onChange={handleChange}
           className="p-1 rounded w-full outline-none"
         />
-        <button className="px-4 bg-blue-600 text-white">Search</button>
-      </div>
+        {/*Search button*/}
+        <button type="submit" className="px-4 bg-blue-600 text-white">
+          Search
+        </button>
+      </form>
       {/* Results output */}
       {resultsOutput}
     </div>
