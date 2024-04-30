@@ -33,7 +33,6 @@ export async function fetchWeatherData(cityName) {
       timezone: resData.timezone,
     };
     // Return
-    console.log(weatherData);
     return weatherData;
   }
 }

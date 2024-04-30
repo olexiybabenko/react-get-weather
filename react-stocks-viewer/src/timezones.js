@@ -197,4 +197,44 @@ const TIMEZONES = [
   },
 ];
 
-export default TIMEZONES;
+// Get current time function
+function getCurrentTime(weatherData) {
+  // Define new Date object
+  let now = new Date();
+  // Calculate time difference based on timezone
+  // difference in hours
+  let diffHours = TIMEZONES.find(
+    (obj) => obj.timezone === weatherData.timezone
+  ).diffHours;
+  // difference in minutes
+  let diffMinutes = TIMEZONES.find(
+    (obj) => obj.timezone === weatherData.timezone
+  ).diffMinutes;
+  // Define hours and minutes variables
+  let minutes = now.getUTCMinutes() + diffMinutes;
+  let hours = now.getUTCHours() + diffHours;
+  // check if minutes change the hour
+  if (minutes < 0) {
+    // if minutes are negative
+    hours = hours - 1;
+    minutes = 60 + minutes;
+  } else if (minutes > 60) {
+    // if minutes are more than 60
+    hours = hours + 1;
+    minutes = minutes - 60;
+  }
+  // Change if hours change the day
+  if (hours < 0) {
+    // if hours are negative
+    hours = 24 - hours;
+  } else if (hours > 23) {
+    // if hours are greater than 23
+    hours = hours - 24;
+  }
+  // Define currentTime object
+  let currentTime = { hours: hours, minutes: minutes };
+  // Return
+  return currentTime;
+}
+
+export { TIMEZONES, getCurrentTime };

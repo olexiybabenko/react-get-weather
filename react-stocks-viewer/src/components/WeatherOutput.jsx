@@ -1,7 +1,7 @@
 // Import
 import { useState } from "react";
 import { fetchWeatherData, fetchForecastData } from "../http"; // fetch functions
-import TIMEZONES from "../timezones"; // array of objects used to calculate time difference based on time zone recieved from fetch
+import { TIMEZONES, getCurrentTime } from "../timezones"; // array of objects used to calculate time difference based on time zone recieved from fetch
 
 // WeatherOutput component
 export default function WeatherOutput() {
@@ -47,44 +47,16 @@ export default function WeatherOutput() {
     <p className="text-center pt-2">Choose the city to check the weather</p>
   );
   // If the is output data
-  if (weatherData) {
-    // Current time
-    // Define new Date object
-    let now = new Date();
-    // Calculate time difference based on timezone
-    // difference in hours
-    let diffHours = TIMEZONES.find(
-      (obj) => obj.timezone === weatherData.timezone
-    ).diffHours;
-    // difference in minutes
-    let diffMinutes = TIMEZONES.find(
-      (obj) => obj.timezone === weatherData.timezone
-    ).diffMinutes;
-    // Define hours and minutes variables
-    let minutes = now.getUTCMinutes() + diffMinutes;
-    let hours = now.getUTCHours() + diffHours;
-    // check if minutes change the hour
-    if (minutes < 0) {
-      // if minutes are negative
-      hours = hours - 1;
-      minutes = 60 + minutes;
-    } else if (minutes > 60) {
-      // if minutes are more than 60
-      hours = hours + 1;
-      minutes = minutes - 60;
-    }
-    // Change if hours change the day
-    if (hours < 0) {
-      // if hours are negative
-      hours = 24 - hours;
-    } else if (hours > 23) {
-      // if hours are greater than 23
-      hours = hours - 24;
-    }
-
-    let currentTime = (
+  if (weatherData && weatherData !== "error") {
+    // Get current time from the fetched data
+    let currentTime = getCurrentTime(weatherData);
+    // Define HTML output
+    let currentTimeOutput = (
       <p>
-        {hours}:{minutes > 9 ? minutes : "0" + minutes}
+        {currentTime.hours}:
+        {currentTime.minutes > 9
+          ? currentTime.minutes
+          : "0" + currentTime.minutes}
       </p>
     );
 
@@ -100,7 +72,7 @@ export default function WeatherOutput() {
         {/* Weather div */}
         <div className="my-1 pt-1 pb-4 border rounded px-2 bg-gradient-to-b from-cyan-100 from-50% to-lime-500">
           <h2 className="font-medium text-lg">Weather</h2>
-          {currentTime}
+          {currentTimeOutput}
           {/* Columns */}
           <div className="flex justify-between pt-1">
             {/* Left column*/}
