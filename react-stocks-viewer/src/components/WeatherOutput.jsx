@@ -61,6 +61,28 @@ export default function WeatherOutput() {
     );
 
     // Conditional background logic
+    // Clear Day
+    let gradientBackground = "from-sky-100 to-lime-500";
+    // Group 2xx: Thunderstorm, Group 3xx: Drizzle, Group 5xx: Rain
+    if (
+      weatherData.code === "2" ||
+      weatherData.code === "3" ||
+      weatherData.code === "5"
+    ) {
+      gradientBackground = "from-sky-700 to-lime-500 text-white";
+    }
+    // Group 6xx: Snow
+    if (weatherData.code === "6") {
+      gradientBackground = "from-sky-300 to-stone-100 from-30%";
+    }
+    // Group 7xx: Atmosphere
+    if (weatherData.code === "7") {
+      gradientBackground = "from-gray-200 to-lime-600 from-60%";
+    }
+    // if it is night
+    if (weatherData.dayNight === "n") {
+      gradientBackground = "from-sky-900 to-gray-900 text-white";
+    }
 
     // Displayed component
     resultsOutput = (
@@ -70,7 +92,9 @@ export default function WeatherOutput() {
           Results for <span className="font-medium">{weatherData.city}</span>{" "}
         </p>
         {/* Weather div */}
-        <div className="my-1 pt-1 pb-4 border rounded px-2 bg-gradient-to-b from-cyan-100 from-50% to-lime-500">
+        <div
+          className={`my-1 pt-1 pb-4 border rounded px-2 bg-gradient-to-b  from-50% ${gradientBackground}`}
+        >
           <h2 className="font-medium text-lg">Weather</h2>
           {currentTimeOutput}
           {/* Columns */}

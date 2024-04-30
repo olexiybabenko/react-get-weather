@@ -27,9 +27,10 @@ export async function fetchWeatherData(cityName) {
       feelsLike: resData.main.feels_like,
       humidity: resData.main.humidity,
       wind: resData.wind.speed,
-      code: resData.weather[0].id,
+      code: resData.weather[0].id.toString().charAt(0),
       description: resData.weather[0].main,
       icon: `https://openweathermap.org/img/wn/${resData.weather[0].icon}@2x.png`,
+      dayNight: resData.weather[0].icon.slice(-1),
       timezone: resData.timezone,
     };
     // Return
