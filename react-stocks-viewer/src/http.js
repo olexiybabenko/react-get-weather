@@ -29,10 +29,11 @@ export async function fetchWeatherData(cityName) {
       wind: resData.wind.speed,
       code: resData.weather[0].id,
       description: resData.weather[0].main,
-      icon: resData.weather[0].icon,
+      icon: `https://openweathermap.org/img/wn/${resData.weather[0].icon}@2x.png`,
       timezone: resData.timezone,
     };
     // Return
+    console.log(weatherData);
     return weatherData;
   }
 }
@@ -72,6 +73,6 @@ export async function fetchForecastData(cityName) {
     // };
     // // Return
     // return weatherData;
-    console.log(resData.list[0]);
+    // console.log(resData.list[0]);
   }
 }

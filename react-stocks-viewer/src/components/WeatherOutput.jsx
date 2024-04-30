@@ -1,9 +1,7 @@
 // Import
 import { useState } from "react";
-import { fetchWeatherData, fetchForecastData } from "../http";
-
-// Test
-fetchForecastData("waRsaw");
+import { fetchWeatherData, fetchForecastData } from "../http"; // fetch functions
+import TIMEZONES from "../timezones"; // array of objects used to calculate time difference based on time zone recieved from fetch
 
 // WeatherOutput component
 export default function WeatherOutput() {
@@ -44,12 +42,110 @@ export default function WeatherOutput() {
   }
 
   // Results output
+  // Waiting for a search
   let resultsOutput = (
     <p className="text-center pt-2">Choose the city to check the weather</p>
   );
   // If the is output data
   if (weatherData) {
-    resultsOutput = <p className="text-center pt-2">{weatherData.city}</p>;
+    // Current time
+    // Define new Date object
+    let now = new Date();
+    // Calculate time difference based on timezone
+    // difference in hours
+    let diffHours = TIMEZONES.find(
+      (obj) => obj.timezone === weatherData.timezone
+    ).diffHours;
+    // difference in minutes
+    let diffMinutes = TIMEZONES.find(
+      (obj) => obj.timezone === weatherData.timezone
+    ).diffMinutes;
+    // Define hours and minutes variables
+    let minutes = now.getUTCMinutes() + diffMinutes;
+    let hours = now.getUTCHours() + diffHours;
+    // check if minutes change the hour
+    if (minutes < 0) {
+      // if minutes are negative
+      hours = hours - 1;
+      minutes = 60 + minutes;
+    } else if (minutes > 60) {
+      // if minutes are more than 60
+      hours = hours + 1;
+      minutes = minutes - 60;
+    }
+    // Change if hours change the day
+    if (hours < 0) {
+      // if hours are negative
+      hours = 24 - hours;
+    } else if (hours > 23) {
+      // if hours are greater than 23
+      hours = hours - 24;
+    }
+
+    let currentTime = (
+      <p>
+        {hours}:{minutes > 9 ? minutes : "0" + minutes}
+      </p>
+    );
+
+    // Conditional background logic
+
+    // Displayed component
+    resultsOutput = (
+      <div className="pt-2 mx-auto text-sm">
+        {/* Results for */}
+        <p className="">
+          Results for <span className="font-medium">{weatherData.city}</span>{" "}
+        </p>
+        {/* Weather div */}
+        <div className="my-1 pt-1 pb-4 border rounded px-2 bg-gradient-to-b from-cyan-100 from-50% to-lime-500">
+          <h2 className="font-medium text-lg">Weather</h2>
+          {currentTime}
+          {/* Columns */}
+          <div className="flex justify-between pt-1">
+            {/* Left column*/}
+            <div>
+              {/* Temperature and Icon*/}
+              <div className="flex justify-between gap-1">
+                {/* Temperature*/}
+                <h1 className="text-2xl">
+                  {Math.round(weatherData.temp)}
+                  <span>°</span>
+                </h1>
+                {/* Icon*/}
+                <img
+                  className="h-8 w-8 align-middle"
+                  src={weatherData.icon}
+                  alt=""
+                />
+              </div>
+              {/* Feels like*/}
+              <p className="font-light text-xs">
+                Feels like
+                <span> {Math.round(weatherData.feelsLike)}</span>
+                <span>°</span>
+              </p>
+            </div>
+            {/* Right column */}
+            <div>
+              {/* Description */}
+              <p className="font-medium">{weatherData.description}</p>
+              {/* Humidity */}
+              <p className="text-xs font-light">
+                Humidity:
+                <span> {weatherData.humidity}%</span>
+              </p>
+              {/* Wind */}
+              <p className="text-xs font-light">
+                Wind:
+                <span> {Math.round(weatherData.wind)}</span>
+                <span> km/h</span>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
   }
   // If there was an error in fetch data
   if (weatherData === "error") {
@@ -60,11 +156,11 @@ export default function WeatherOutput() {
 
   // JSX Output
   return (
-    <div className="pt-3 px-2">
+    <div className="pt-3 px-3">
       {/* Search field */}
       <form
         onSubmit={handleSubmit}
-        className="flex flex-nowrap justify-between  border border-black rounded max-w-96 mx-auto"
+        className="flex flex-nowrap justify-between  border border-black rounded max-w-80 mx-auto"
       >
         {/*Search Input*/}
         <input
