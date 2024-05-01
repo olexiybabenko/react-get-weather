@@ -59,20 +59,29 @@ export async function fetchForecastData(cityName) {
     let error = "error";
     return error;
   } else {
-    // Define the weatherData object that will store all the weather data
-    // let weatherData = {
-    //   city: resData.name,
-    //   temp: resData.main.temp,
-    //   feelsLike: resData.main.feels_like,
-    //   humidity: resData.main.humidity,
-    //   wind: resData.wind.speed,
-    //   code: resData.weather[0].id,
-    //   description: resData.weather[0].main,
-    //   icon: resData.weather[0].icon,
-    //   timezone: resData.timezone,
-    // };
-    // // Return
-    // return weatherData;
-    // console.log(resData.list[0]);
+    // Define FORECAST_DATA array of forecastData objects
+    const FORECAST_DATA = [];
+    // For each forecastData element in the fetched data
+    for (let i = 0; i < resData.list.length; i++) {
+      // Define the forecastData object that will store all the forecast data
+      let forecastData = {
+        city: resData.list[i].name,
+        time: resData.list[i].dt_txt,
+        temp: resData.list[i].main.temp,
+        tempMax: resData.list[i].main.temp_max,
+        tempMin: resData.list[i].main.temp_min,
+        feelsLike: resData.list[i].main.feels_like,
+        humidity: resData.list[i].main.humidity,
+        wind: resData.list[i].wind.speed,
+        code: resData.list[i].weather[0].id,
+        description: resData.list[i].weather[0].main,
+        icon: `https://openweathermap.org/img/wn/${resData.list[i].weather[0].icon}@2x.png`,
+        timezone: resData.list[i].timezone,
+      };
+      // Append forecastData object to the FORECAST_DATA array
+      FORECAST_DATA.push(forecastData);
+    }
+    // Return
+    return FORECAST_DATA;
   }
 }

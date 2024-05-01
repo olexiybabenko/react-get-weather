@@ -1,7 +1,9 @@
 // Import
 import { useState } from "react";
 import { fetchWeatherData, fetchForecastData } from "../http"; // fetch functions
-import { TIMEZONES, getCurrentTime } from "../timezones"; // array of objects used to calculate time difference based on time zone recieved from fetch
+import { getCurrentTime } from "../timezones"; // array of objects used to calculate time difference based on time zone recieved from fetch
+import ForecastElement from "./ForecastElement"; // ForecastElement component
+import WeekForecastElement from "./WeekForecastElement"; // WeekForecastElement component
 
 // WeatherOutput component
 export default function WeatherOutput() {
@@ -9,6 +11,8 @@ export default function WeatherOutput() {
   const [isFetching, setIsFetching] = useState(false);
   // useState - manage the data you are fetching (weather data)
   const [weatherData, setWeatherData] = useState();
+  // useState - manage the data you are fetching (forecast data)
+  const [forecastData, setForecastData] = useState();
   // useState - watch potentional errors
   const [fetchError, setFetchError] = useState();
   // useState - watch the text of the search field
@@ -32,6 +36,10 @@ export default function WeatherOutput() {
       const weatherData = await fetchWeatherData(searchField);
       // use setWeatherData so that useState watches it
       setWeatherData(weatherData);
+      // Call the fetchWeatherData function
+      const FORECAST_DATA = await fetchForecastData(searchField);
+      console.log(FORECAST_DATA);
+      setForecastData(FORECAST_DATA);
     } catch (error) {
       // if error was encountered
       // useState function
@@ -43,9 +51,11 @@ export default function WeatherOutput() {
 
   // Results output
   // Waiting for a search
-  let resultsOutput = (
+  let weatherDataOutput = (
     <p className="text-center pt-2">Choose the city to check the weather</p>
   );
+  // Define forecastDataOutput
+  let forecastDataOutput;
   // If the is output data
   if (weatherData && weatherData !== "error") {
     // Get current time from the fetched data
@@ -84,9 +94,9 @@ export default function WeatherOutput() {
       gradientBackground = "from-sky-900 to-gray-900 text-white";
     }
 
-    // Displayed component
-    resultsOutput = (
-      <div className="pt-2 mx-auto text-sm">
+    // weatherDataOutput displayed component
+    weatherDataOutput = (
+      <div className="pt-2 mx-auto text-sm md:text-base max-w-2xl">
         {/* Results for */}
         <p className="">
           Results for <span className="font-medium">{weatherData.city}</span>{" "}
@@ -95,7 +105,7 @@ export default function WeatherOutput() {
         <div
           className={`my-1 pt-1 pb-4 border rounded px-2 bg-gradient-to-b  from-50% ${gradientBackground}`}
         >
-          <h2 className="font-medium text-lg">Weather</h2>
+          <h2 className="font-medium text-lg md:text-xl">Weather</h2>
           {currentTimeOutput}
           {/* Columns */}
           <div className="flex justify-between pt-1">
@@ -104,7 +114,7 @@ export default function WeatherOutput() {
               {/* Temperature and Icon*/}
               <div className="flex justify-between gap-1">
                 {/* Temperature*/}
-                <h1 className="text-2xl">
+                <h1 className="text-2xl md:text-3xl">
                   {Math.round(weatherData.temp)}
                   <span>°</span>
                 </h1>
@@ -116,7 +126,7 @@ export default function WeatherOutput() {
                 />
               </div>
               {/* Feels like*/}
-              <p className="font-light text-xs">
+              <p className="font-light text-xs md:text-sm">
                 Feels like
                 <span> {Math.round(weatherData.feelsLike)}</span>
                 <span>°</span>
@@ -127,12 +137,12 @@ export default function WeatherOutput() {
               {/* Description */}
               <p className="font-medium">{weatherData.description}</p>
               {/* Humidity */}
-              <p className="text-xs font-light">
+              <p className="text-xs md:text-sm font-light">
                 Humidity:
                 <span> {weatherData.humidity}%</span>
               </p>
               {/* Wind */}
-              <p className="text-xs font-light">
+              <p className="text-xs md:text-sm font-light">
                 Wind:
                 <span> {Math.round(weatherData.wind)}</span>
                 <span> km/h</span>
@@ -142,10 +152,41 @@ export default function WeatherOutput() {
         </div>
       </div>
     );
+
+    // If forecastData has already been loaded
+    if (forecastData) {
+      // Create a weeklyForecastData array
+      let weeklyForecastData = [7, 15, 23, 31, 39].map((i) => forecastData[i]);
+      // ForecastData component
+      forecastDataOutput = (
+        <>
+          {/* 24h forecast */}
+          <div className="flex flex-nowrap justify-between overflow-x-auto gap-2 text-xs max-w-2xl mx-auto">
+            {forecastData.slice(1, 9).map((forecast) => (
+              <ForecastElement
+                time={forecast.time}
+                icon={forecast.icon}
+                temp={forecast.temp}
+              />
+            ))}
+          </div>
+          {/* 5-Day forecast */}
+          <div className="flex flex-nowrap justify-between overflow-x-auto gap-2 text-xs max-w-2xl mx-auto mt-3">
+            {weeklyForecastData.map((forecast) => (
+              <WeekForecastElement
+                time={forecast.time}
+                icon={forecast.icon}
+                temp={forecast.temp}
+              />
+            ))}
+          </div>
+        </>
+      );
+    }
   }
   // If there was an error in fetch data
   if (weatherData === "error") {
-    resultsOutput = (
+    weatherDataOutput = (
       <p className="text-center pt-2">Please enter a valid city name</p>
     );
   }
@@ -171,8 +212,10 @@ export default function WeatherOutput() {
           Search
         </button>
       </form>
-      {/* Results output */}
-      {resultsOutput}
+      {/* Weather data output */}
+      {weatherDataOutput}
+      {/* Forecast data output */}
+      {forecastDataOutput}
     </div>
   );
 }
