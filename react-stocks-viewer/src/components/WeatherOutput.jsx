@@ -19,7 +19,7 @@ export default function WeatherOutput() {
 
   // useState - watch the selected button
   // Create a destructed array to store the value (1 - the current state; 2 - what to change)
-  const [selectedTopic, setSelectedTopic] = useState();
+  const [selectedTopic, setSelectedTopic] = useState("temperature");
   // Add the handleClick function
   function handleClick(selectedButton) {
     // setSelectedTopic function that is controlled by useState
@@ -192,6 +192,10 @@ export default function WeatherOutput() {
             {forecastData.slice(1, 9).map((forecast) => (
               <ForecastElement
                 key={forecast.time}
+                selectedTopic={selectedTopic}
+                wind={forecast.wind}
+                windDirection={forecast.windDirection}
+                humidity={forecast.humidity}
                 time={forecast.time}
                 icon={forecast.icon}
                 temp={forecast.temp}
@@ -206,6 +210,10 @@ export default function WeatherOutput() {
                 time={forecast.time}
                 icon={forecast.icon}
                 temp={forecast.temp}
+                selectedTopic={selectedTopic}
+                wind={forecast.wind}
+                windDirection={forecast.windDirection}
+                humidity={forecast.humidity}
               />
             ))}
           </div>
