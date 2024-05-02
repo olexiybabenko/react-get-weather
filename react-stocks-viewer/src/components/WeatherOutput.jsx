@@ -4,6 +4,7 @@ import { fetchWeatherData, fetchForecastData } from "../http"; // fetch function
 import { getCurrentTime } from "../timezones"; // array of objects used to calculate time difference based on time zone recieved from fetch
 import ForecastElement from "./ForecastElement"; // ForecastElement component
 import WeekForecastElement from "./WeekForecastElement"; // WeekForecastElement component
+import TabButton from "./TabButton"; // TabButton component
 
 // WeatherOutput component
 export default function WeatherOutput() {
@@ -15,9 +16,18 @@ export default function WeatherOutput() {
   const [forecastData, setForecastData] = useState();
   // useState - watch potentional errors
   const [fetchError, setFetchError] = useState();
+
+  // useState - watch the selected button
+  // Create a destructed array to store the value (1 - the current state; 2 - what to change)
+  const [selectedTopic, setSelectedTopic] = useState();
+  // Add the handleClick function
+  function handleClick(selectedButton) {
+    // setSelectedTopic function that is controlled by useState
+    setSelectedTopic(selectedButton);
+  }
+
   // useState - watch the text of the search field
   const [searchField, setSearchField] = useState("");
-
   // handleChange function - watch change of the search term
   function handleChange(event) {
     // useState - watch change of the search term
@@ -38,7 +48,6 @@ export default function WeatherOutput() {
       setWeatherData(weatherData);
       // Call the fetchWeatherData function
       const FORECAST_DATA = await fetchForecastData(searchField);
-      console.log(FORECAST_DATA);
       setForecastData(FORECAST_DATA);
     } catch (error) {
       // if error was encountered
@@ -103,7 +112,7 @@ export default function WeatherOutput() {
         </p>
         {/* Weather div */}
         <div
-          className={`my-1 pt-1 pb-4 border rounded px-2 bg-gradient-to-b  from-50% ${gradientBackground}`}
+          className={`mt-1 pt-1 pb-4 border rounded px-2 bg-gradient-to-b  from-50% ${gradientBackground}`}
         >
           <h2 className="font-medium text-lg md:text-xl">Weather</h2>
           {currentTimeOutput}
@@ -120,7 +129,7 @@ export default function WeatherOutput() {
                 </h1>
                 {/* Icon*/}
                 <img
-                  className="h-8 w-8 align-middle"
+                  className="h-8 w-8 md:h-10 md:w-10 align-middle"
                   src={weatherData.icon}
                   alt=""
                 />
@@ -154,16 +163,35 @@ export default function WeatherOutput() {
     );
 
     // If forecastData has already been loaded
-    if (forecastData) {
+    if (forecastData && forecastData !== "error") {
       // Create a weeklyForecastData array
       let weeklyForecastData = [7, 15, 23, 31, 39].map((i) => forecastData[i]);
       // ForecastData component
       forecastDataOutput = (
         <>
+          {/*Buttons of topics - onClick tab-content will be displayed*/}
+          <div className="flex flex-nowrap  mx-auto max-w-2xl border-b border-gray-300">
+            <TabButton
+              text={"Temperature"}
+              isSelected={selectedTopic === "temperature"}
+              onClick={() => handleClick("temperature")}
+            />
+            <TabButton
+              text={"Wind"}
+              isSelected={selectedTopic === "wind"}
+              onClick={() => handleClick("wind")}
+            />
+            <TabButton
+              text={"Humidity"}
+              isSelected={selectedTopic === "humidity"}
+              onClick={() => handleClick("humidity")}
+            />
+          </div>
           {/* 24h forecast */}
-          <div className="flex flex-nowrap justify-between overflow-x-auto gap-2 text-xs max-w-2xl mx-auto">
+          <div className="flex flex-nowrap justify-between overflow-x-auto gap-2 text-xs md:text-sm max-w-2xl mx-auto pt-1">
             {forecastData.slice(1, 9).map((forecast) => (
               <ForecastElement
+                key={forecast.time}
                 time={forecast.time}
                 icon={forecast.icon}
                 temp={forecast.temp}
@@ -171,9 +199,10 @@ export default function WeatherOutput() {
             ))}
           </div>
           {/* 5-Day forecast */}
-          <div className="flex flex-nowrap justify-between overflow-x-auto gap-2 text-xs max-w-2xl mx-auto mt-3">
+          <div className="flex flex-nowrap justify-between overflow-x-auto gap-2 text-xs md:text-sm max-w-2xl mx-auto mt-3">
             {weeklyForecastData.map((forecast) => (
               <WeekForecastElement
+                key={forecast.time}
                 time={forecast.time}
                 icon={forecast.icon}
                 temp={forecast.temp}

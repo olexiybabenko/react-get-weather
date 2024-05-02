@@ -6,7 +6,7 @@ export default function ForecastElement({ time, icon, temp }) {
       {/* Time */}
       <p className="font-light text-center">{time.slice(11, 16)}</p>
       {/* Icon */}
-      <img className="h-7 w-7 align-middle" src={icon} alt="" />
+      <img className="h-7 md:h-10 w-7 md:w-10 align-middle" src={icon} alt="" />
       {/* Temperature */}
       <p className=" text-center">
         {Math.round(temp)}
