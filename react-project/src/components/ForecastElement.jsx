@@ -1,5 +1,12 @@
+// import images
+import drop0 from "../assets/drop_0.png";
+import drop25 from "../assets/drop_25.png";
+import drop50 from "../assets/drop_50.png";
+import drop75 from "../assets/drop_75.png";
+import drop100 from "../assets/drop_100.png";
+
 // ForecastElement component
-export default function WeekForecastElement({
+export default function ForecastElement({
   time,
   icon,
   temp,
@@ -8,13 +15,6 @@ export default function WeekForecastElement({
   windDirection,
   humidity,
 }) {
-  // Define the date object to get the day week
-  const date = new Date(time);
-  // Define an array of day of week names
-  const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-  // Define the currentDayOfWeek  time.slice(5, 10)
-  const currentDayOfWeek = daysOfWeek[date.getDay()];
-
   // Conditionally display the output
   // Define output
   let output;
@@ -24,13 +24,13 @@ export default function WeekForecastElement({
       <>
         {/* Icon */}
         <img
-          className="h-7 md:h-10 w-7 md:w-10 align-middle mx-auto"
+          className="h-7 md:h-10 w-7 md:w-10 align-middle"
           src={icon}
           alt=""
         />
         {/* Temperature */}
         <p className=" text-center">
-          <span>{Math.round(temp)}</span>
+          {Math.round(temp)}
           <span>°</span>
         </p>
       </>
@@ -60,9 +60,25 @@ export default function WeekForecastElement({
       </>
     );
   } else if (selectedTopic === "humidity") {
+    // Define the humidity icon
+    let humidityIcon;
+    // Based on humidity - choose the icon
+    if (humidity < 12.5) {
+      humidityIcon = drop0;
+    } else if (12.5 <= humidity && humidity < 37.5) {
+      humidityIcon = drop25;
+    } else if (37.5 <= humidity && humidity < 62.5) {
+      humidityIcon = drop50;
+    } else if (62.5 <= humidity && humidity < 87.5) {
+      humidityIcon = drop75;
+    } else if (87.5 <= humidity) {
+      humidityIcon = drop100;
+    }
     // Display humidity
     output = (
       <>
+        {/* Icon */}
+        <img className="w-3 md:w-5 mx-auto mt-1" src={humidityIcon} alt="" />
         {/* Humidity */}
         <p className=" text-center py-2">
           {Math.round(humidity)}
@@ -71,12 +87,11 @@ export default function WeekForecastElement({
       </>
     );
   }
-
   // JSX Output
   return (
-    <div className="p-1 border border-gray-400  rounded">
-      {/* Day of week */}
-      <p className="font-light text-center">{currentDayOfWeek}</p>
+    <div className="px-1">
+      {/* Time */}
+      <p className="font-light text-center">{time.slice(11, 16)}</p>
       {/* Conditionally display the output */}
       {output}
     </div>
